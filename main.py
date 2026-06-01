@@ -1,8 +1,6 @@
-"""
-main.py - Стартира играта Pac-Man.
-Създава обект от класа PacManGame и се използват неговите методи.
-Съдържа: цикли, условни изрази, сортиране.
-"""
+# main.py - Стартира играта Pac-Man.
+# Създава обект от класа PacManGame и се използват неговите методи.
+# Съдържа: цикли, условни изрази, сортиране.
 
 import pygame
 import sys
@@ -10,13 +8,10 @@ import os
 
 from models import PacManGame
 
-# ──────────────────────────────────────────────
-#  КОНСТАНТИ
-# ──────────────────────────────────────────────
 CELL = 32  # размер на клетка в пиксели
 FPS = 10  # кадри в секунда
 
-# Цветова палитра (ретро аркада)
+# Цветова палитра (retro arcade)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 220, 0)
@@ -35,14 +30,9 @@ GHOST_COLORS = {
     "Clyde": ORANGE,
 }
 
-
-# ──────────────────────────────────────────────
-#  ПОМОЩНИ ФУНКЦИИ ЗА РИСУВАНЕ
-# ──────────────────────────────────────────────
-def draw_maze(screen, game):
-    """Рисува лабиринта клетка по клетка – използва вложен цикъл."""
-    for row_idx, row in enumerate(game.maze):  # цикъл по редове
-        for col_idx, cell in enumerate(row):  # цикъл по колони
+def draw_maze(screen, game): # --Рисува лабиринта клетка по клетка – използвайки вложен цикъл
+    for row_idx, row in enumerate(game.maze):  # ---------------------------- цикъл по редове
+        for col_idx, cell in enumerate(row):  # ----------------------------- цикъл по колони
             x = col_idx * CELL
             y = row_idx * CELL
 
@@ -64,30 +54,24 @@ def draw_pacman(screen, game):
     pygame.draw.circle(screen, YELLOW, (px, py), CELL // 2 - 2)
 
 
-def draw_ghosts(screen, game):
-    """
-    Рисува духовете – ако е power mode, стават сини.
-    Използва условен израз.
-    """
+def draw_ghosts(screen, game): # --Рисува духовете – ако е power mode, стават сини. Използва условен израз.
     for ghost in game.ghosts:
         gx = ghost["x"] * CELL
         gy = ghost["y"] * CELL
         color = (0, 0, 200) if game.power_mode else GHOST_COLORS[ghost["name"]]
 
-        # Тяло (правоъгълник с заоблен връх)
+                               # -------(Тялото е нарисувано от правоъгълник с заоблен връх)
         body = pygame.Rect(gx + 2, gy + CELL // 3, CELL - 4, CELL - CELL // 3 - 2)
         pygame.draw.rect(screen, color, body)
         pygame.draw.circle(screen, color,
                            (gx + CELL // 2, gy + CELL // 3), (CELL - 4) // 2)
 
-        # Очи (бели с тъмна зеница)
+                               # -------(Очите са бели с тъмна зеница)
         for ex, ey in [(gx + 9, gy + 10), (gx + 21, gy + 10)]:
             pygame.draw.circle(screen, WHITE, (ex, ey), 4)
             pygame.draw.circle(screen, BLACK, (ex + 1, ey + 1), 2)
 
-
-def draw_hud(screen, game, font):
-    """Рисува резултата, животите и нивото."""
+def draw_hud(screen, game, font): # ----------Рисува резултата - животи и ниво
     score_txt = font.render(f"Score: {game.score}", True, WHITE)
     lives_txt = font.render(f"Lives: {game.lives}", True, YELLOW)
     level_txt = font.render(f"Level: {game.level}", True, CYAN)
@@ -96,8 +80,7 @@ def draw_hud(screen, game, font):
     screen.blit(level_txt, (380, game.height * CELL + 5))
 
 
-def draw_overlay(screen, game, font_big, font_small):
-    """Показва съобщение при край на игра или победа – условен израз."""
+def draw_overlay(screen, game, font_big, font_small): # Показва съобщение при край на игра или победа – условен израз.
     if game.game_over:
         if game.won:
             msg = "YOU WIN!"
@@ -117,11 +100,7 @@ def draw_overlay(screen, game, font_big, font_small):
         screen.blit(txt, txt.get_rect(center=(cx, game.height * CELL // 2 - 20)))
         screen.blit(sub, sub.get_rect(center=(cx, game.height * CELL // 2 + 30)))
 
-
-# ──────────────────────────────────────────────
-#  ТАБЛИЦА С РЕЗУЛТАТИ (демонстрира сортиране)
-# ──────────────────────────────────────────────
-LEADERBOARD = [
+LEADERBOARD = [ # ---------------Score Table // Таблица с резултати
     {"name": "Alice", "score": 1500},
     {"name": "Bob", "score": 3200},
     {"name": "Carol", "score": 800},
@@ -129,11 +108,8 @@ LEADERBOARD = [
 ]
 
 
-def show_leaderboard(game):
-    """
-    Добавя резултата на играча, сортира класацията и я отпечатва.
-    Демонстрира използването на метода get_sorted_scores() от models.py.
-    """
+def show_leaderboard(game): # --Добавя резултата на играча, сортира класацията и я отпечатва.
+                            # --Демонстрира използването на метода get_sorted_scores() от models.py
     LEADERBOARD.append({"name": "You", "score": game.score})
     sorted_lb = game.get_sorted_scores(LEADERBOARD)  # ← метод от класа
 
@@ -146,15 +122,10 @@ def show_leaderboard(game):
         print(f"  {i}. {entry['name']:<10} {entry['score']:>6} pts{marker}")
     print("══════════════════════════\n")
 
-
-# ──────────────────────────────────────────────
-#  ГЛАВНА ФУНКЦИЯ
-# ──────────────────────────────────────────────
 def main():
     pygame.init()
     pygame.display.set_caption("Pac-Man  –  Python курсова работа")
 
-    # ── Създаване на обект от класа (изисквано) ──
     game = PacManGame()
 
     WIN_W = game.width * CELL
@@ -167,13 +138,9 @@ def main():
     font_small = pygame.font.SysFont("consolas", 22)
     font_hud = pygame.font.SysFont("consolas", 20)
 
-    ghost_timer = 0  # управлява честотата на движение на духовете
-
-    # ── Главен игрови цикъл ──
-    running = True
-    while running:
-
-        # ── Обработка на събития ──
+    ghost_timer = 0   # --Управлява честотата на движение на духовете
+    running = True   # -----Главен игрови цикъл
+    while running:  # ------Обработка на събития
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -184,12 +151,11 @@ def main():
 
                 elif event.key == pygame.K_r and game.game_over:
                     show_leaderboard(game)
-                    game.reset()  # ← метод от класа
+                    game.reset()
 
-                elif not game.game_over:
-                    # Посоки на движение – условни изрази
+                elif not game.game_over:       # -----Посоки на движение
                     if event.key in (pygame.K_LEFT, pygame.K_a):
-                        game.move_pacman(-1, 0)  # ← метод от класа
+                        game.move_pacman(-1, 0)
                     elif event.key in (pygame.K_RIGHT, pygame.K_d):
                         game.move_pacman(1, 0)
                     elif event.key in (pygame.K_UP, pygame.K_w):
@@ -197,14 +163,12 @@ def main():
                     elif event.key in (pygame.K_DOWN, pygame.K_s):
                         game.move_pacman(0, 1)
 
-        # ── Движение на духовете (по-бавно от Pac-Man) ──
-        if not game.game_over:
+        if not game.game_over:  # --Движение на духовете
             ghost_timer += 1
-            if ghost_timer >= 3:  # духовете се движат всеки 3-ти кадър
-                game.move_ghosts()  # ← метод от класа
+            if ghost_timer >= 3:
+                game.move_ghosts()
                 ghost_timer = 0
 
-        # ── Рисуване ──
         screen.fill(BLACK)
         draw_maze(screen, game)
         draw_pacman(screen, game)
@@ -215,8 +179,7 @@ def main():
         pygame.display.flip()
         clock.tick(FPS)
 
-        # ── Печата статус в конзолата при game over ──
-        status = game.get_status()  # ← метод от класа
+        status = game.get_status() # -----Съобщение когато играта свърши (game over)
         if status["game_over"]:
             result = "WON" if status["won"] else "LOST"
             print(f"[STATUS] Game {result} | Score: {status['score']} | Lives: {status['lives']}")
@@ -225,5 +188,5 @@ def main():
     sys.exit()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # ------Стартер
     main()
