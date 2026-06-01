@@ -21,7 +21,7 @@ pacman/
 └── readme.txt        ← описание на играта
 
 
-ИЗПОЛЗВАНИ БИБЛИОТЕКИ
+ИЗПОЛЗВАНИ БИБЛИОТЕКИ // REQUIREMENTS
 ---------------------
   pygame 2.6.1  – графика и управление (pip install pygame)
   pygame-ce - за по-нови вераии на PyCharm
